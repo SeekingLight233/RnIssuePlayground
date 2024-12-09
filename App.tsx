@@ -2,39 +2,53 @@ import * as React from 'react';
 import {NavigationContainer} from '@react-navigation/native';
 import {createStackNavigator} from '@react-navigation/stack';
 import {SafeAreaProvider} from 'react-native-safe-area-context';
-import {Text, View, Button} from 'react-native';
-import Video from 'react-native-video';
+import {StyleSheet, Text, useWindowDimensions, View} from 'react-native';
+import {TabView, SceneMap} from 'react-native-tab-view';
+
+function FirstRoute() {
+  return (
+    <View style={{flex: 1, alignItems: 'center', justifyContent: 'center'}}>
+      <Text>FirstRoute</Text>
+    </View>
+  );
+}
+
+function SecondRoute() {
+  return (
+    <View style={{flex: 1, alignItems: 'center', justifyContent: 'center'}}>
+      <Text>SecondRoute</Text>
+    </View>
+  );
+}
+
+const renderScene = SceneMap({
+  first: FirstRoute,
+  second: SecondRoute,
+});
+
+const routes = [
+  {key: 'first', title: 'First'},
+  {key: 'second', title: 'Second'},
+];
 
 const Stack = createStackNavigator();
 
 function HomeScreen({navigation}) {
+  const layout = useWindowDimensions();
+  const [index, setIndex] = React.useState(0);
+
   return (
-    <View
-      style={{
-        flex: 1,
-        alignItems: 'center',
-        justifyContent: 'center',
-        backgroundColor: 'purple',
-      }}>
-      <Video
-        repeat={false}
-        fullscreenAutorotate={false}
-        // Can be a URL or a local file.
-        source={{
-          // uri: 'https://videos.pexels.com/video-files/4121820/4121820-sd_640_360_25fps.mp4',
-          // uri: 'https://videos.pexels.com/video-files/5538183/5538183-sd_960_506_25fps.mp4'
-          // uri: 'https://xsj-video.699pic.com/03/dw/1z.mp4',
-          uri: 'https://xsj-video.699pic.com/04/22/a9.mp4',
+    <View style={{flex: 1}}>
+      <Text>HomeScreen</Text>
+      <TabView
+        style={{flex: 1}}
+        navigationState={{index, routes}}
+        renderScene={renderScene}
+        onIndexChange={i => {
+          setIndex(i);
+          console.log('onIndexChange', i);
         }}
-        style={{flex: 1, borderWidth: 2, width: '100%'}}
-        progressUpdateInterval={30}
-        resizeMode="contain"
-        automaticallyWaitsToMinimizeStalling={false}
-        preferredForwardBufferDuration={3000}
-      />
-      <Button
-        title="Navigate to Detail"
-        onPress={() => navigation.navigate('Details')}
+        initialLayout={{width: layout.width}}
       />
     </View>
   );
@@ -60,3 +74,11 @@ export default function App() {
     </SafeAreaProvider>
   );
 }
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+});
