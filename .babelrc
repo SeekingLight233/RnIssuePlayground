@@ -1,0 +1,8 @@
+{
+  "env": {
+
+  },
+  "plugins": [
+    "react-native-reanimated/plugin"
+  ]
+}

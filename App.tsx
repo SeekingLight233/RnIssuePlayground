@@ -2,9 +2,19 @@ import * as React from 'react';
 import {NavigationContainer} from '@react-navigation/native';
 import {createStackNavigator} from '@react-navigation/stack';
 import {SafeAreaProvider} from 'react-native-safe-area-context';
-import {StyleSheet, Text, useWindowDimensions, View} from 'react-native';
+import {
+  StyleSheet,
+  Text,
+  TextInput,
+  useWindowDimensions,
+  View,
+} from 'react-native';
 import {TabView, SceneMap} from 'react-native-tab-view';
-
+import {
+  KeyboardProvider,
+  useReanimatedKeyboardAnimation,
+} from 'react-native-keyboard-controller';
+import Reanimated, {useAnimatedStyle} from 'react-native-reanimated';
 function FirstRoute() {
   return (
     <View style={{flex: 1, alignItems: 'center', justifyContent: 'center'}}>
@@ -33,23 +43,25 @@ const routes = [
 
 const Stack = createStackNavigator();
 
+const AnimatedTextInput = Reanimated.createAnimatedComponent(TextInput);
+
 function HomeScreen({navigation}) {
-  const layout = useWindowDimensions();
-  const [index, setIndex] = React.useState(0);
+  const {height} = useReanimatedKeyboardAnimation();
+
+  const textInputStyle = useAnimatedStyle(
+    () => ({
+      height: 50,
+      width: '100%',
+      backgroundColor: '#BCBCBC',
+      transform: [{translateY: height.value}],
+    }),
+    [],
+  );
 
   return (
-    <View style={{flex: 1}}>
+    <View style={{flex: 1, justifyContent: 'space-between'}}>
       <Text>HomeScreen</Text>
-      <TabView
-        style={{flex: 1}}
-        navigationState={{index, routes}}
-        renderScene={renderScene}
-        onIndexChange={i => {
-          setIndex(i);
-          console.log('onIndexChange', i);
-        }}
-        initialLayout={{width: layout.width}}
-      />
+      <AnimatedTextInput style={textInputStyle} />
     </View>
   );
 }
@@ -65,12 +77,14 @@ function DetailsScreen({navigation}) {
 export default function App() {
   return (
     <SafeAreaProvider>
-      <NavigationContainer>
-        <Stack.Navigator>
-          <Stack.Screen name="Home" component={HomeScreen} />
-          <Stack.Screen name="Details" component={DetailsScreen} />
-        </Stack.Navigator>
-      </NavigationContainer>
+      <KeyboardProvider>
+        <NavigationContainer>
+          <Stack.Navigator>
+            <Stack.Screen name="Home" component={HomeScreen} />
+            <Stack.Screen name="Details" component={DetailsScreen} />
+          </Stack.Navigator>
+        </NavigationContainer>
+      </KeyboardProvider>
     </SafeAreaProvider>
   );
 }
